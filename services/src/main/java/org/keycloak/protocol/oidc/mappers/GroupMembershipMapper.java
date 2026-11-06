@@ -99,9 +99,10 @@ public class GroupMembershipMapper extends AbstractOIDCProtocolMapper implements
                 ModelToRepresentation::buildGroupPath : GroupModel::getName;
         List<String> membership = userSession.getUser().getGroupsStream().map(toGroupRepresentation).collect(Collectors.toList());
 
-        // force multivalued as the attribute is not defined for this mapper
-        mappingModel.getConfig().put(ProtocolMapperUtils.MULTIVALUED, "true");
-        OIDCAttributeMapperHelper.mapClaim(token, mappingModel, membership);
+        // force multivalued as the attribute is not defined for this mapper, on a copy as the mapping model is cached and shared
+        ProtocolMapperModel model = new ProtocolMapperModel(mappingModel);
+        model.getConfig().put(ProtocolMapperUtils.MULTIVALUED, "true");
+        OIDCAttributeMapperHelper.mapClaim(token, model, membership);
     }
 
     public static ProtocolMapperModel create(String name,
